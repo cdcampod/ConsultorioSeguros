@@ -2,7 +2,7 @@
 using Newtonsoft.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 
-namespace ConsultorioSeguros.Models.MySql
+namespace ConsultorioSeguros.Models.SQL
 {
     [JsonObject(NamingStrategyType = typeof(CamelCaseNamingStrategy))]
     public class Seguro

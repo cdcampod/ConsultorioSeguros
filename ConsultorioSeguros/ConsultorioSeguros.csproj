@@ -262,10 +262,10 @@
     <Compile Include="Helpers\ExcelHelper.cs" />
     <Compile Include="Models\API\ReplyDatatable.cs" />
     <Compile Include="Models\API\Reply.cs" />
-    <Compile Include="Models\MySql\Seguro_cliente.cs" />
-    <Compile Include="Models\MySql\Cliente.cs" />
-    <Compile Include="Models\MySql\Seguro.cs" />
-    <Compile Include="Models\MySql\ConsultorioDbContext.cs" />
+    <Compile Include="Models\SQL\Seguro_cliente.cs" />
+    <Compile Include="Models\SQL\Cliente.cs" />
+    <Compile Include="Models\SQL\Seguro.cs" />
+    <Compile Include="Models\SQL\ConsultorioDbContext.cs" />
     <Compile Include="Models\ViewData\ClienteViewData.cs" />
     <Compile Include="Models\ViewData\SegurosAsignadosModelData.cs" />
     <Compile Include="Models\ViewData\ClienteAseguradoViewData.cs" />
@@ -341,7 +341,8 @@
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
-    <Content Include="Models\MySql\ScriptDb\ConsultorioDb.sql" />
+    <Content Include="Models\SQL\ScriptDb\ConsultorioDb - MySQL.sql" />
+    <Content Include="Models\SQL\ScriptDb\ConsultorioDb - SQL Server.sql" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.js" />

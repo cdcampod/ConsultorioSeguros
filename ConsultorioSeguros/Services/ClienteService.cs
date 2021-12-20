@@ -1,5 +1,5 @@
 ﻿using ConsultorioSeguros.Models.API;
-using ConsultorioSeguros.Models.MySql;
+using ConsultorioSeguros.Models.SQL;
 using ConsultorioSeguros.Models.ViewData;
 using OfficeOpenXml;
 using System;
@@ -12,7 +12,7 @@ namespace ConsultorioSeguros.Services
 {
     public class ClienteService
     {
-        private readonly ConsultorioDbContext _consultorioDbContext = new ConsultorioDbContext("MySqlConnection");
+        private readonly ConsultorioDbContext _consultorioDbContext = new ConsultorioDbContext("ServerConnection");
 
         public ReplyDatatable GetClientesData(HttpRequest contextRequest)
         {

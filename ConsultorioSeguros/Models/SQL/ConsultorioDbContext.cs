@@ -1,6 +1,6 @@
 ﻿using System.Data.Entity;
 
-namespace ConsultorioSeguros.Models.MySql
+namespace ConsultorioSeguros.Models.SQL
 {
     public class ConsultorioDbContext : DbContext
     {

@@ -2,14 +2,15 @@
 using Newtonsoft.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 
-namespace ConsultorioSeguros.Models.MySql
+namespace ConsultorioSeguros.Models.SQL
 {
     [JsonObject(NamingStrategyType = typeof(CamelCaseNamingStrategy))]
-    public class Seguro_cliente
+    public class Cliente
     {
         [Key]
-        public int Id { get; set; }
-        public string Codigo_seguro { get; set; }
         public string Cedula { get; set; }
+        public string Nombre { get; set; }
+        public string Telefono { get; set; }
+        public int Edad { get; set; }
     }
 }
