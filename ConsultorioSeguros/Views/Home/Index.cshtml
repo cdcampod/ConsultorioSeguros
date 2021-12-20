@@ -167,7 +167,7 @@
                     {
                         "data": "codigo", "name": "Actions", "mRender": function (data, type, row, meta) {
                             var actions =
-                                '<a href="javascript:void(0);" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#editarModal">'
+                                @*'<a href="javascript:void(0);" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#editarModal">'
                                     + '<i class="fa fa-edit" ></i> '
                                 + '</a> '
                                 + '<a href="@System.Configuration.ConfigurationManager.AppSettings["AppHost"]/Home/clientesAsegurados?codigo=' + data + '" class="btn btn-secondary btn-sm">'
@@ -175,7 +175,23 @@
                                 + '</a> '
                                 + '<a href="javascript:void(0);" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#eliminarModal">'
                                     + '<i class="fa fa-trash" ></i> '
-                                + '</a>';
+                                + '</a>';*@
+                                '<div class="dropdown">' +
+                                        '<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-expanded="false">'+
+                                            ''+
+                                        '</button>'+
+                                        '<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">'+
+                                            '<a href="javascript:void(0);" class="dropdown-item" data-toggle="modal" data-target="#editarModal">' +
+                                                '<i class="fa fa-edit" ></i> Editar' +
+                                            '</a>' +
+                                            '<a href="@System.Configuration.ConfigurationManager.AppSettings["AppHost"]/Home/clientesAsegurados?codigo=' + data + '" class="dropdown-item">' +
+                                                '<i class="fa fa-eye" ></i> Clientes Asegurados' +
+                                            '</a>' +
+                                            '<a href="javascript:void(0);" class="dropdown-item" data-toggle="modal" data-target="#eliminarModal">' +
+                                                '<i class="fa fa-trash" ></i> Eliminar' +
+                                            '</a>' +
+                                        '</div>' +
+                                    '</div>';
                             return actions;
                         }
                     }
