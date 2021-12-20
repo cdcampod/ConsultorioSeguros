@@ -1,0 +1,311 @@
+﻿@section styles{
+    <link href="~/Content/fontawesome.min.css" rel="stylesheet" />
+    <link href="~/Content/solid.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+}
+
+@{
+    ViewBag.Title = "Seguros del Cliente";
+}
+<h2>@ViewBag.Title</h2>
+
+<br />
+
+<a href="@System.Configuration.ConfigurationManager.AppSettings["AppHost"]/Home/Clientes" class="btn btn-secondary btn-sm">
+    <i class="fa fa-arrow-left"></i> Atrás
+</a>
+
+<button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#crearModal">
+    <i class="fa fa-plus"></i> Asignar
+</button>
+
+<hr />
+
+<div class="hookNotify"></div>
+
+<h4 class="text font-weight-bold">Datos del cliente</h4>
+<hr />
+<div class="row">
+    <div class="col col-sm-4">
+        <span class="text font-weight-bold">Cédula: </span> <span class="text" name="spnCedula"></span>
+    </div>
+    <div class="col col-sm-4">
+        <span class="text font-weight-bold">Edad: </span> <span class="text" name="spnEdad"></span>
+    </div>
+</div>
+<div class="row">
+    <div class="col col-sm-4">
+        <span class="text font-weight-bold">Nombre: </span> <span class="text" name="spnNombre"></span>
+    </div>
+    <div class="col col-sm-4">
+        <span class="text font-weight-bold">Teléfono: </span> <span class="text" name="spnTelefono"></span>
+    </div>
+</div>
+<hr />
+
+<table id="tablaSeguro" class="table table-striped table-bordered" style="width:100%">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Código</th>
+            <th>Nombre</th>
+            <th>Prima</th>
+            <th>Suma Asegurada</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<!-- Modal -->
+<div class="modal fade" id="crearModal" aria-labelledby="crearModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="crearModalLabel">Asignar Seguro</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="selectSeguro">Seguros: </label>
+                        <select class="form-control" id="selectSeguro">
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button id="btnAsignarSeguro" type="button" class="btn btn-success">Grabar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="eliminarModal" tabindex="-1" aria-labelledby="eliminarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="crearModalLabel">Eliminar Seguro</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <span>¿Desea desvincular el seguro </span>  <span id="spnCodigoDel" class="text font-weight-bold"></span> <span>?</span>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                <button id="btnEliminarCliente" type="button" class="btn btn-danger">Si</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="~/Scripts/notify.min.js"></script>
+
+    <script>
+        var tablaSeguro;
+
+        var codigo = "";
+        var cedula = '@ViewBag.cedula';
+
+        var cod = "";
+
+        $(document).ready(function () {
+            InitTable();
+            InitSelect();
+        });
+
+        function InitSelect() {
+            $("#selectSeguro").select2({
+                ajax: {
+                    url: '@System.Configuration.ConfigurationManager.AppSettings["AppHost"]/api/SeguroCliente/seguros',
+                    dataType: 'json',
+                    data: function (params) {
+                        var query = {
+                            search: params.term
+                        }
+
+                        return query;
+                    },
+                    processResults: function (data) {
+                        //console.log(data.data);
+                        // Transforms the top-level key of the response object from 'items' to 'results'
+                        return {
+                            results: data.data
+                        };
+                    }
+                },
+                placeholder: "-- Select --",
+                minimumInputLength: 2,
+                allowClear: true,
+            });
+        }
+
+        function InitTable() {
+            tablaSeguro = $('#tablaSeguro').DataTable({
+                "processing": true,
+                "serverSide": true,
+                "ajax": {
+                    "url": '@System.Configuration.ConfigurationManager.AppSettings["AppHost"]/api/SeguroCliente/list/@ViewBag.cedula',
+                    "type": "POST",
+                    "datatype": "json",
+                    "dataSrc": function (response) {
+                        $('[name="spnCedula"]').html(response.additionalData.Cedula);
+                        $('[name="spnEdad"]').html(response.additionalData.Edad);
+                        $('[name="spnNombre"]').html(response.additionalData.Nombre);
+                        $('[name="spnTelefono"]').html(response.additionalData.Telefono);
+
+                        return response.data;
+                    }
+                },
+                columns: [
+                    { "data": null, "name": "RowNumber" },
+                    { "data": "codigo", "name": "Codigo" },
+                    { "data": "nombre", "name": "Nombre" },
+                    { "data": "prima", "name": "Prima" },
+                    { "data": "suma_asegurada", "name": "Suma_asegurada" },
+                    {
+                        "data": "null", "name": "Actions", "mRender": function (data, type, row, meta) {
+                            var actions =
+                                '<a href="javascript:void(0);" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#eliminarModal">'
+                                    + '<i class="fa fa-trash" ></i> '
+                                + '</a>';
+                            return actions;
+                        }
+                    }
+                ],
+                "columnDefs": [
+                    { "defaultContent": "-", "targets": "_all" },
+                    { "className": "text text-center font-weight-bold", "searchable": false, "orderable": false, "visible": true, "targets": 0 },
+                    { "className": "all cod text text-left", "searchable": true, "orderable": true, "visible": true, "targets": 1 },
+                    { "className": "all nom text text-left", "searchable": true, "orderable": true, "visible": true, "targets": 2 },
+                    { "className": "pri text text-right", "searchable": true, "orderable": true, "visible": true, "targets": 3 },
+                    { "className": "sum text text-right", "searchable": true, "orderable": true, "visible": true, "targets": 4 },
+                    { "className": "text-center", "searchable": false, "orderable": false, "visible": true, "targets": 5 }
+                ],
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    var numStart = this.fnPagingInfo().iStart;
+                    var index = numStart + iDisplayIndexFull + 1;
+                    $('td:eq(0)', nRow).html(index);
+                    return nRow;
+                }
+            });
+        }
+
+        $("#btnAsignarSeguro").click(function () {
+            /*codigo = $('#selectSeguro').find(":selected").attr("id");*/
+            codigo = $('#selectSeguro').val();
+            AsignarSeguro();
+            $('#crearModal').modal('hide');
+        });
+
+        function AsignarSeguro() {
+            var seguro_cliente = { "Codigo_seguro": codigo, "Cedula": cedula };
+
+            $.ajax({
+                type: 'POST',
+                url: '@System.Configuration.ConfigurationManager.AppSettings["AppHost"]/api/SeguroCliente/add',
+                dataType: 'JSON',
+                contentType: "application/json;charset=utf-8",
+                processData: true,
+                async: true,
+                data: JSON.stringify(seguro_cliente),
+                success: function (res) {
+                    tablaSeguro.draw();
+
+                    if (res.result == 1) {
+                        notifyColor = "success";
+                    }
+                    else {
+                        notifyColor = "error";
+                    }
+
+                    $(".hookNotify").notify(res.message, {
+                        position: "bottom center",
+                        className: notifyColor,
+                        autoHide: true,
+                        autoHideDelay: 3000
+
+                    });
+                },
+                error: function (xhr, status, p3, p4) {
+                    LogError(xhr, status, p3, p4);
+                }
+            });
+        }
+
+        $("#crearModal").on("hidden.bs.modal", function (e) {
+            $('#selectSeguro').val(null).trigger('change');
+
+            tablaSeguro.clear();
+            tablaSeguro.draw();
+        });
+
+        /*********************************************************************************************************/
+
+        $('#tablaSeguro tbody').on('click', 'td a', function () {
+            cod = $(this).closest("tr")   // Finds the closest row <tr>
+                .find(".cod")     // Gets a descendent with class="nr"
+                .text();
+        });
+
+        $("#eliminarModal").on("shown.bs.modal", function (e) {
+            $('#spnCodigoDel').html(cod);
+        });
+
+        $("#btnEliminarCliente").click(function () {
+            codigo = $("#spnCodigoDel").html();
+            EliminarCliente();
+            $('#eliminarModal').modal('hide');
+        });
+
+        function EliminarCliente() {
+            var seguro_cliente = { "Codigo_seguro": codigo, "Cedula": cedula };
+
+            $.ajax({
+                type: 'DELETE',
+                url: '@System.Configuration.ConfigurationManager.AppSettings["AppHost"]/api/SeguroCliente/delete',
+                dataType: 'JSON',
+                contentType: "application/json;charset=utf-8",
+                processData: true,
+                async: true,
+                data: JSON.stringify(seguro_cliente),
+                success: function (res) {
+                    tablaSeguro.draw();
+
+                    if (res.result == 1) {
+                        notifyColor = "success";
+                    }
+                    else {
+                        notifyColor = "error";
+                    }
+
+                    $(".hookNotify").notify(res.message, {
+                        position: "bottom center",
+                        className: notifyColor,
+                        autoHide: true,
+                        autoHideDelay: 3000
+                    });
+                },
+                error: function (xhr, status, p3, p4) {
+                    LogError(xhr, status, p3, p4);
+                }
+            });
+        }
+
+        $("#eliminarModal").on("hidden.bs.modal", function (e) {
+            $('#spnCodigoDel').html("");
+
+            tablaSeguro.clear();
+            tablaSeguro.draw();
+        });
+
+    </script>
+}

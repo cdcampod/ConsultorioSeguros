@@ -1,0 +1,385 @@
+﻿@section styles{
+    <link href="~/Content/fontawesome.min.css" rel="stylesheet" />
+    <link href="~/Content/solid.min.css" rel="stylesheet" />
+}
+
+@{
+    ViewBag.Title = "Seguros";
+}
+<h2>@ViewBag.Title</h2>
+
+<br />
+
+<button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#crearModal">
+    <i class="fa fa-plus"></i> Crear
+</button>
+
+<hr />
+
+<div class="hookNotify"></div>
+
+<table id="tablaSeguro" class="table table-striped table-bordered" style="width:100%">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Código</th>
+            <th>Nombre</th>
+            <th>Prima</th>
+            <th>Suma Asegurada</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<!-- Modal -->
+<div class="modal fade" id="crearModal" tabindex="-1" aria-labelledby="crearModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="crearModalLabel">Crear Seguro</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="codigo">Código</label>
+                        <input type="text" class="form-control" id="codigo" placeholder="">
+                    </div>
+                    <div class="form-group">
+                        <label for="nombre">Nombre</label>
+                        <input type="text" class="form-control" id="nombre" placeholder="">
+                    </div>
+                    <div class="form-group">
+                        <label for="prima">Prima ($)</label>
+                        <input type="text" class="form-control" id="prima" placeholder="">
+                    </div>
+                    <div class="form-group">
+                        <label for="sumaAsegurada">Suma Asegurada ($)</label>
+                        <input type="text" class="form-control" id="sumaAsegurada" placeholder="">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button id="btnCrearSeguro" type="button" class="btn btn-success">Grabar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="editarModal" tabindex="-1" aria-labelledby="editarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="crearModalLabel">Editar Seguro</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="codigoUpd">Código</label>
+                        <input type="text" class="form-control" id="codigoUpd" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="nombreUpd">Nombre</label>
+                        <input type="text" class="form-control" id="nombreUpd">
+                    </div>
+                    <div class="form-group">
+                        <label for="primaUpd">Prima ($)</label>
+                        <input type="text" class="form-control" id="primaUpd">
+                    </div>
+                    <div class="form-group">
+                        <label for="sumaAseguradaUpd">Suma Asegurada ($)</label>
+                        <input type="text" class="form-control" id="sumaAseguradaUpd">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button id="btnEditarSeguro" type="button" class="btn btn-success">Actualizar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="eliminarModal" tabindex="-1" aria-labelledby="eliminarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="crearModalLabel">Eliminar Seguro</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <span>¿Desea eliminar el seguro </span>  <span id="spnCodigoDel" class="text font-weight-bold"></span> <span>?</span>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                <button id="btnEliminarSeguro" type="button" class="btn btn-danger">Si</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script src="~/Scripts/notify.min.js"></script>
+
+    <script>
+        var tablaSeguro;
+
+        var codigo = "";
+        var nombre = "";
+        var prima = 0;
+        var suma_asegurada = 0;
+
+        var cod = "";
+        var nom = "";
+        var pri = "";
+        var sum = "";
+
+        $(document).ready(function () {
+            InitTable();
+        });
+
+        function InitTable() {
+            tablaSeguro = $('#tablaSeguro').DataTable({
+                "processing": true,
+                "serverSide": true,
+                "ajax": {
+                    "url": '@System.Configuration.ConfigurationManager.AppSettings["AppHost"]/api/Seguro/list',
+                    "type": "POST",
+                    "datatype": "json"
+                },
+                columns: [
+                    { "data": null, "name": "RowNumber" },
+                    { "data": "codigo", "name": "Codigo" },
+                    { "data": "nombre", "name": "Nombre" },
+                    { "data": "prima", "name": "Prima" },
+                    { "data": "suma_asegurada", "name": "Suma_asegurada" },
+                    {
+                        "data": "codigo", "name": "Actions", "mRender": function (data, type, row, meta) {
+                            var actions =
+                                '<a href="javascript:void(0);" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#editarModal">'
+                                    + '<i class="fa fa-edit" ></i> '
+                                + '</a> '
+                                + '<a href="@System.Configuration.ConfigurationManager.AppSettings["AppHost"]/Home/clientesAsegurados?codigo=' + data + '" class="btn btn-secondary btn-sm">'
+                                + '<i class="fa fa-eye" ></i> '
+                                + '</a> '
+                                + '<a href="javascript:void(0);" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#eliminarModal">'
+                                    + '<i class="fa fa-trash" ></i> '
+                                + '</a>';
+                            return actions;
+                        }
+                    }
+                ],
+                "columnDefs": [
+                    { "defaultContent": "-", "targets": "_all" },
+                    { "className": "text text-center font-weight-bold", "searchable": false, "orderable": false, "visible": true, "targets": 0 },
+                    { "className": "all cod text text-left", "searchable": true, "orderable": true, "visible": true, "targets": 1 },
+                    { "className": "all nom text text-left", "searchable": true, "orderable": true, "visible": true, "targets": 2 },
+                    { "className": "pri text text-right", "searchable": true, "orderable": true, "visible": true, "targets": 3 },
+                    { "className": "sum text text-right", "searchable": true, "orderable": true, "visible": true, "targets": 4 },
+                    { "className": "text-center", "searchable": false, "orderable": false, "visible": true, "targets": 5 }
+                ],
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    var numStart = this.fnPagingInfo().iStart;
+                    var index = numStart + iDisplayIndexFull + 1;
+                    $('td:eq(0)', nRow).html(index);
+                    return nRow;
+                }
+            });
+        }
+
+        $("#btnCrearSeguro").click(function () {
+            codigo = $("#codigo").val();
+            nombre = $("#nombre").val();
+            prima = parseFloat($("#prima").val());
+            suma_asegurada = parseFloat($("#sumaAsegurada").val());
+            CrearSeguro();
+            $('#crearModal').modal('hide');
+        });
+
+        function CrearSeguro() {
+            var seguro = { "Codigo": codigo, "Nombre": nombre, "Prima": prima, "Suma_asegurada": suma_asegurada };
+
+            $.ajax({
+                type: 'POST',
+                url: '@System.Configuration.ConfigurationManager.AppSettings["AppHost"]/api/Seguro/add',
+                dataType: 'JSON',
+                contentType: "application/json;charset=utf-8",
+                processData: true,
+                async: true,
+                data: JSON.stringify(seguro),
+                success: function (res) {
+                    tablaSeguro.draw();
+
+                    if (res.result == 1) {
+                        notifyColor = "success";
+                    }
+                    else {
+                        notifyColor = "error";
+                    }
+
+                    $(".hookNotify").notify(res.message, {
+                        position: "bottom center",
+                        className: notifyColor,
+                        autoHide: true,
+                        autoHideDelay: 3000
+
+                    });
+                },
+                error: function (xhr, status, p3, p4) {
+                    LogError(xhr, status, p3, p4);
+                }
+            });
+        }
+
+        $("#crearModal").on("hidden.bs.modal", function (e) {
+            $('#codigo').val("");
+            $('#nombre').val("");
+            $('#prima').val("");
+            $('#sumaAsegurada').val("");
+
+            tablaSeguro.clear();
+            tablaSeguro.draw();
+        });
+
+        /*********************************************************************************************************/
+
+        $('#tablaSeguro tbody').on('click', 'td a', function () {
+            cod = $(this).closest("tr")   // Finds the closest row <tr>
+                .find(".cod")     // Gets a descendent with class="nr"
+                .text();
+            nom = $(this).closest("tr")
+                .find(".nom")
+                .text();
+            pri = $(this).closest("tr")
+                .find(".pri")
+                .text();
+            sum = $(this).closest("tr")
+                .find(".sum")
+                .text();
+        });
+
+        $("#editarModal").on("shown.bs.modal", function (e) {
+            $('#codigoUpd').val(cod);
+            $('#nombreUpd').val(nom);
+            $('#primaUpd').val(pri);
+            $('#sumaAseguradaUpd').val(sum);
+        });
+
+        $("#btnEditarSeguro").click(function () {
+            codigo = $("#codigoUpd").val();
+            nombre = $("#nombreUpd").val();
+            prima = parseFloat($("#primaUpd").val());
+            suma_asegurada = parseFloat($("#sumaAseguradaUpd").val());
+            EditarSeguro();
+            $('#editarModal').modal('hide');
+        });
+
+        function EditarSeguro() {
+            var seguro = { "Codigo": codigo, "Nombre": nombre, "Prima": prima, "Suma_asegurada": suma_asegurada };
+
+            $.ajax({
+                type: 'PUT',
+                url: '@System.Configuration.ConfigurationManager.AppSettings["AppHost"]/api/Seguro/update',
+                dataType: 'JSON',
+                contentType: "application/json;charset=utf-8",
+                processData: true,
+                async: true,
+                data: JSON.stringify(seguro),
+                success: function (res) {
+                    tablaSeguro.draw();
+
+                    if (res.result == 1) {
+                        notifyColor = "success";
+                    }
+                    else {
+                        notifyColor = "error";
+                    }
+
+                    $(".hookNotify").notify(res.message, {
+                        position: "bottom center",
+                        className: notifyColor,
+                        autoHide: true,
+                        autoHideDelay: 3000
+                    });
+                },
+                error: function (xhr, status, p3, p4) {
+                    LogError(xhr, status, p3, p4);
+                }
+            });
+        }
+
+        $("#editarModal").on("hidden.bs.modal", function (e) {
+            $('#codigoUpd').val("");
+            $('#nombreUpd').val("");
+            $('#primaUpd').val("");
+            $('#sumaAseguradaUpd').val("");
+
+            tablaSeguro.clear();
+            tablaSeguro.draw();
+        });
+
+        /*********************************************************************************************************/
+        $("#eliminarModal").on("shown.bs.modal", function (e) {
+            $('#spnCodigoDel').html(cod);
+        });
+
+        $("#btnEliminarSeguro").click(function () {
+            codigo = $("#spnCodigoDel").html();
+            EliminarSeguro();
+            $('#eliminarModal').modal('hide');
+        });
+
+        function EliminarSeguro() {
+            var seguro = { "Codigo": codigo };
+
+            $.ajax({
+                type: 'DELETE',
+                url: '@System.Configuration.ConfigurationManager.AppSettings["AppHost"]/api/Seguro/delete',
+                dataType: 'JSON',
+                contentType: "application/json;charset=utf-8",
+                processData: true,
+                async: true,
+                data: JSON.stringify(seguro),
+                success: function (res) {
+                    tablaSeguro.draw();
+
+                    if (res.result == 1) {
+                        notifyColor = "success";
+                    }
+                    else {
+                        notifyColor = "error";
+                    }
+
+                    $(".hookNotify").notify(res.message, {
+                        position: "bottom center",
+                        className: notifyColor,
+                        autoHide: true,
+                        autoHideDelay: 3000
+                    });
+                },
+                error: function (xhr, status, p3, p4) {
+                    LogError(xhr, status, p3, p4);
+                }
+            });
+        }
+
+        $("#eliminarModal").on("hidden.bs.modal", function (e) {
+            $('#spnCodigoDel').html("");
+
+            tablaSeguro.clear();
+            tablaSeguro.draw();
+        });
+
+    </script>
+}

@@ -1,0 +1,515 @@
+﻿@section styles{
+    <link href="~/Content/fontawesome.min.css" rel="stylesheet" />
+    <link href="~/Content/solid.min.css" rel="stylesheet" />
+}
+
+@{
+    ViewBag.Title = "Clientes";
+}
+<h2>@ViewBag.Title</h2>
+
+<br />
+
+<div class="row">
+    <div class="col col-sm">
+        <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#crearModal">
+            <i class="fa fa-plus"></i> Crear
+        </button>
+
+        <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#cargarModal">
+            <i class="fa fa-file-excel"></i> Cargar
+        </button>
+    </div>
+</div>
+
+<hr />
+
+<div class="hookNotify"></div>
+
+<table id="tablaCliente" class="table table-striped table-bordered" style="width:100%">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Cédula</th>
+            <th>Nombre</th>
+            <th>Teléfono</th>
+            <th>Edad</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<!-- Modal -->
+<div class="modal fade" id="crearModal" tabindex="-1" aria-labelledby="crearModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="crearModalLabel">Crear Cliente</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="cedula">Cédula</label>
+                        <input type="text" class="form-control" id="cedula" placeholder="">
+                    </div>
+                    <div class="form-group">
+                        <label for="nombre">Nombre</label>
+                        <input type="text" class="form-control" id="nombre" placeholder="">
+                    </div>
+                    <div class="form-group">
+                        <label for="telefono">Teléfono</label>
+                        <input type="text" class="form-control" id="telefono" placeholder="">
+                    </div>
+                    <div class="form-group">
+                        <label for="edad">Edad</label>
+                        <input type="text" class="form-control" id="edad" placeholder="">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button id="btnCrearCliente" type="button" class="btn btn-success">Grabar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="cargarModal" tabindex="-1" aria-labelledby="cargarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cargarModalLabel">Cargar Archivo de Clientes</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="excelFile" accept=".xlsx">
+                            <label class="custom-file-label" for="excelFile">Seleccionar archivo</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button id="btnCargarCliente" type="button" class="btn btn-success">Cargar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="editarModal" tabindex="-1" aria-labelledby="editarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="crearModalLabel">Editar Cliente</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="cedulaUpd">Cédula</label>
+                        <input type="text" class="form-control" id="cedulaUpd" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="nombreUpd">Nombre</label>
+                        <input type="text" class="form-control" id="nombreUpd">
+                    </div>
+                    <div class="form-group">
+                        <label for="telefonoUpd">Teléfono</label>
+                        <input type="text" class="form-control" id="telefonoUpd">
+                    </div>
+                    <div class="form-group">
+                        <label for="edadUpd">Edad</label>
+                        <input type="text" class="form-control" id="edadUpd">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button id="btnEditarCliente" type="button" class="btn btn-success">Actualizar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="eliminarModal" tabindex="-1" aria-labelledby="eliminarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="crearModalLabel">Eliminar Cliente</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <span>¿Desea eliminar al cliente </span>  <span id="spnCedulaDel" class="text font-weight-bold"></span> <span>?</span>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                <button id="btnEliminarCliente" type="button" class="btn btn-danger">Si</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script src="~/Scripts/notify.min.js"></script>
+
+    <script>
+        var tablaCliente;
+
+        var cedula = "";
+        var nombre = "";
+        var telefono = 0;
+        var edad = 0;
+
+        var ced = "";
+        var nom = "";
+        var tel = "";
+        var eda = "";
+
+        var files;
+
+        $(document).ready(function () {
+            InitTable();
+        });
+
+        function InitTable() {
+            tablaCliente = $('#tablaCliente').DataTable({
+                "processing": true,
+                "serverSide": true,
+                "ajax": {
+                    "url": '@System.Configuration.ConfigurationManager.AppSettings["AppHost"]/api/Cliente/list',
+                    "type": "POST",
+                    "datatype": "json"
+                },
+                columns: [
+                    { "data": null, "name": "RowNumber" },
+                    { "data": "cedula", "name": "Cedula" },
+                    { "data": "nombre", "name": "Nombre" },
+                    { "data": "telefono", "name": "Telefono" },
+                    { "data": "edad", "name": "Edad" },
+                    {
+                        "data": "cedula", "name": "Actions", "mRender": function (data, type, row, meta) {
+                            var actions =
+                                '<a href="javascript:void(0);" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#editarModal">'
+                                    + '<i class="fa fa-edit" ></i> '
+                                + '</a> '
+                                + '<a href="@System.Configuration.ConfigurationManager.AppSettings["AppHost"]/Home/SegurosAsignados?cedula=' + data + '" class="btn btn-secondary btn-sm">'
+                                + '<i class="fa fa-plus" ></i> '
+                                + '</a> '
+                                + '<a href="javascript:void(0);" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#eliminarModal">'
+                                    + '<i class="fa fa-trash" ></i> '
+                                + '</a>';
+                            return actions;
+                        }
+                    }
+                ],
+                "columnDefs": [
+                    { "defaultContent": "-", "targets": "_all" },
+                    { "className": "text text-center font-weight-bold", "searchable": false, "orderable": false, "visible": true, "targets": 0 },
+                    { "className": "all ced text text-left", "searchable": true, "orderable": true, "visible": true, "targets": 1 },
+                    { "className": "all nom text text-left", "searchable": true, "orderable": true, "visible": true, "targets": 2 },
+                    { "className": "tel text text-right", "searchable": true, "orderable": true, "visible": true, "targets": 3 },
+                    { "className": "eda text text-right", "searchable": true, "orderable": true, "visible": true, "targets": 4 },
+                    { "className": "text-center", "searchable": false, "orderable": false, "visible": true, "targets": 5 }
+                ],
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    var numStart = this.fnPagingInfo().iStart;
+                    var index = numStart + iDisplayIndexFull + 1;
+                    $('td:eq(0)', nRow).html(index);
+                    return nRow;
+                }
+            });
+        }
+
+        $("#btnCrearCliente").click(function () {
+            cedula = $("#cedula").val();
+            nombre = $("#nombre").val();
+            telefono = $("#telefono").val();
+            edad = parseInt($("#edad").val());
+            CrearCliente();
+            $('#crearModal').modal('hide');
+        });
+
+        function CrearCliente() {
+            var seguro = { "Cedula": cedula, "Nombre": nombre, "Telefono": telefono, "Edad": edad };
+
+            $.ajax({
+                type: 'POST',
+                url: '@System.Configuration.ConfigurationManager.AppSettings["AppHost"]/api/Cliente/add',
+                dataType: 'JSON',
+                contentType: "application/json;charset=utf-8",
+                processData: true,
+                async: true,
+                data: JSON.stringify(seguro),
+                success: function (res) {
+                    tablaCliente.draw();
+
+                    if (res.result == 1) {
+                        notifyColor = "success";
+                    }
+                    else {
+                        notifyColor = "error";
+                    }
+
+                    $(".hookNotify").notify(res.message, {
+                        position: "bottom center",
+                        className: notifyColor,
+                        autoHide: true,
+                        autoHideDelay: 3000
+
+                    });
+                },
+                error: function (xhr, status, p3, p4) {
+                    LogError(xhr, status, p3, p4);
+                }
+            });
+        }
+
+        $("#crearModal").on("hidden.bs.modal", function (e) {
+            $('#cedula').val("");
+            $('#nombre').val("");
+            $('#telefono').val("");
+            $('#edad').val("");
+
+            tablaCliente.clear();
+            tablaCliente.draw();
+        });
+
+        /*********************************************************************************************************/
+
+        $('#tablaCliente tbody').on('click', 'td a', function () {
+            ced = $(this).closest("tr")   // Finds the closest row <tr>
+                .find(".ced")     // Gets a descendent with class="nr"
+                .text();
+            nom = $(this).closest("tr")
+                .find(".nom")
+                .text();
+            tel = $(this).closest("tr")
+                .find(".tel")
+                .text();
+            eda = $(this).closest("tr")
+                .find(".eda")
+                .text();
+        });
+
+        $("#editarModal").on("shown.bs.modal", function (e) {
+            $('#cedulaUpd').val(ced);
+            $('#nombreUpd').val(nom);
+            $('#telefonoUpd').val(tel);
+            $('#edadUpd').val(eda);
+        });
+
+        $("#btnEditarCliente").click(function () {
+            cedula = $("#cedulaUpd").val();
+            nombre = $("#nombreUpd").val();
+            telefono = $("#telefonoUpd").val();
+            edad = parseInt($("#edadUpd").val());
+            EditarCliente();
+            $('#editarModal').modal('hide');
+        });
+
+        function EditarCliente() {
+            var seguro = { "Cedula": cedula, "Nombre": nombre, "Telefono": telefono, "Edad": edad };
+
+            $.ajax({
+                type: 'PUT',
+                url: '@System.Configuration.ConfigurationManager.AppSettings["AppHost"]/api/Cliente/update',
+                dataType: 'JSON',
+                contentType: "application/json;charset=utf-8",
+                processData: true,
+                async: true,
+                data: JSON.stringify(seguro),
+                success: function (res) {
+                    tablaCliente.draw();
+
+                    if (res.result == 1) {
+                        notifyColor = "success";
+                    }
+                    else {
+                        notifyColor = "error";
+                    }
+
+                    $(".hookNotify").notify(res.message, {
+                        position: "bottom center",
+                        className: notifyColor,
+                        autoHide: true,
+                        autoHideDelay: 3000
+                    });
+                },
+                error: function (xhr, status, p3, p4) {
+                    LogError(xhr, status, p3, p4);
+                }
+            });
+        }
+
+        $("#editarModal").on("hidden.bs.modal", function (e) {
+            $('#cedulaUpd').val("");
+            $('#nombreUpd').val("");
+            $('#telefonoUpd').val("");
+            $('#edadUpd').val("");
+
+            tablaCliente.clear();
+            tablaCliente.draw();
+        });
+
+        /*********************************************************************************************************/
+        $("#eliminarModal").on("shown.bs.modal", function (e) {
+            $('#spnCedulaDel').html(ced);
+        });
+
+        $("#btnEliminarCliente").click(function () {
+            cedula = $("#spnCedulaDel").html();
+            EliminarCliente();
+            $('#eliminarModal').modal('hide');
+        });
+
+        function EliminarCliente() {
+            var seguro = { "Cedula": cedula };
+
+            $.ajax({
+                type: 'DELETE',
+                url: '@System.Configuration.ConfigurationManager.AppSettings["AppHost"]/api/Cliente/delete',
+                dataType: 'JSON',
+                contentType: "application/json;charset=utf-8",
+                processData: true,
+                async: true,
+                data: JSON.stringify(seguro),
+                success: function (res) {
+                    tablaCliente.draw();
+
+                    if (res.result == 1) {
+                        notifyColor = "success";
+                    }
+                    else {
+                        notifyColor = "error";
+                    }
+
+                    $(".hookNotify").notify(res.message, {
+                        position: "bottom center",
+                        className: notifyColor,
+                        autoHide: true,
+                        autoHideDelay: 3000
+                    });
+                },
+                error: function (xhr, status, p3, p4) {
+                    LogError(xhr, status, p3, p4);
+                }
+            });
+        }
+
+        $("#eliminarModal").on("hidden.bs.modal", function (e) {
+            $('#spnCedulaDel').html("");
+
+            tablaCliente.clear();
+            tablaCliente.draw();
+        });
+
+        /*********************************************************************************************************/
+
+        $(".custom-file-input").on("change", function (e) {
+            // Add the following code if you want the name of the file appear on select
+            var filename = $(this).val().split("\\").pop();
+            var ext = filename.split('.')[1];
+
+            if (filename.length > 25) {
+                filename = filename.substr(0, 20) + '...' + ext;
+            }
+
+            $(this).siblings(".custom-file-label").addClass("selected").html(filename);
+
+            //load the file
+            files = e.target.files;
+
+            if (files && files.length > 0) {
+
+            }
+            else {
+                var input = $('#excelFile');
+                input.replaceWith(input.val('').clone(true));
+
+                $(".custom-file-input").siblings(".custom-file-label").addClass("selected").html("Seleccionar archivo");
+            }
+        });
+
+        $("#btnCargarCliente").click(function () {
+            CargarCliente();
+            $('#cargarModal').modal('hide');
+        });
+
+        function CargarCliente() {
+            if (files) {
+                if (files.length > 0) {
+                    if (window.FormData !== undefined) {
+                        var data = new FormData();
+                        for (var x = 0; x < files.length; x++) {
+                            data.append("file" + x, files[x]);
+                        }
+
+                        var endpoint = '@System.Configuration.ConfigurationManager.AppSettings["AppHost"]/api/Cliente/upload';
+
+                        $.ajax({
+                            type: "POST",
+                            url: endpoint,
+                            contentType: false,
+                            processData: false,
+                            async: true,
+                            data: data,
+                            success: function (res) {
+                                tablaCliente.draw();
+
+                                if (res.result == 1) {
+                                    notifyColor = "success";
+                                }
+                                else {
+                                    notifyColor = "error";
+                                }
+
+                                $(".hookNotify").notify(res.message, {
+                                    position: "bottom center",
+                                    className: notifyColor,
+                                    autoHide: true,
+                                    autoHideDelay: 3000
+
+                                });
+                            },
+                            error: function (xhr, status, p3, p4) {
+                                LogError(xhr, status, p3, p4);
+                            }
+                        });
+                    } else {
+                        alert("Este navegador no soporta carga de archivos con HTML5");
+                    }
+                }
+                    }
+                    else
+                    {
+                        alert("Por favor, seleccione un archivo");
+                    }
+        }
+
+        $("#cargarModal").on("hidden.bs.modal", function (e) {
+            var input = $('#excelFile');
+            input.replaceWith(input.val('').clone(true));
+
+            $(".custom-file-input").siblings(".custom-file-label").addClass("selected").html("Seleccionar archivo");
+
+            tablaCliente.clear();
+            tablaCliente.draw();
+        });
+    </script>
+}
